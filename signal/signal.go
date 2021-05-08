@@ -1,14 +1,15 @@
-package carbon
+package signal
 
 import (
 	"context"
+	"github.com/farwydi/carbon/server"
 
 	"github.com/drone/signal"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
 
-func NewSignal(ctx context.Context, logger *zap.Logger) *Signal {
+func New(ctx context.Context, logger *zap.Logger) *Signal {
 	return &Signal{
 		ctx:    signal.WithContext(ctx),
 		logger: logger,
@@ -35,13 +36,13 @@ func (s *Signal) AddIf(condition bool, f func(ctx context.Context) error) {
 	}
 }
 
-func (s *Signal) AddServer(srv Server) {
+func (s *Signal) AddServer(srv server.Server) {
 	s.eg.Go(func() error {
 		return srv.Run(s.ctx)
 	})
 }
 
-func (s *Signal) AddServerIf(condition bool, srv Server) {
+func (s *Signal) AddServerIf(condition bool, srv server.Server) {
 	if condition {
 		s.eg.Go(func() error {
 			return srv.Run(s.ctx)

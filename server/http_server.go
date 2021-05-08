@@ -1,4 +1,4 @@
-package carbon
+package server
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func NewHTTPServer(addr string, logger *zap.Logger, router http.Handler) Server {
+func NewHTTP(addr string, logger *zap.Logger, router http.Handler) Server {
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: router,
@@ -23,21 +23,21 @@ type httpServer struct {
 	logger *zap.Logger
 }
 
-func (t *httpServer) Run(ctx context.Context) error {
+func (s *httpServer) Run(ctx context.Context) error {
 	var g errgroup.Group
 	g.Go(func() error {
 		<-ctx.Done()
 
-		t.logger.Info("Shutting down http server...")
+		s.logger.Info("Shutting down http server...")
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		return t.srv.Shutdown(ctx)
+		return s.srv.Shutdown(ctx)
 	})
 	g.Go(func() error {
-		t.logger.Info("Starting http server",
-			zap.String("addr", t.addr))
-		if err := t.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		s.logger.Info("Starting http server",
+			zap.String("addr", s.addr))
+		if err := s.srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			return err
 		}
 		return nil
