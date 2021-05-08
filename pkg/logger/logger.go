@@ -65,7 +65,7 @@ func New(config ...Config) fiber.Handler {
 		)
 
 		if chainErr != nil {
-			logger.Error("Error in handler",
+			logger.Error("Access",
 				zap.Error(chainErr))
 			return nil
 		}
