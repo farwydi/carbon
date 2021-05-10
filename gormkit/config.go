@@ -18,6 +18,7 @@ type Config struct {
 	User     string `default:"postgres"`
 	Password string `default:""`
 	Host     string
+	Port     string `default:"5432"`
 
 	MaxOpenConns    int           `yaml:"max_open_conns" default:"0"`
 	MaxIdleConns    int           `yaml:"max_idle_conns" default:"2"`
@@ -37,10 +38,11 @@ func (ds Config) ToString() (string, error) {
 		return "", ErrSetupName
 	}
 
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		ds.Host,
 		ds.User,
 		ds.Password,
 		ds.Name,
+		ds.Port,
 	), nil
 }
